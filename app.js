@@ -4,8 +4,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
-
+// const encrypt = require("mongoose-encryption");
+// const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const app = express();
 
@@ -21,7 +23,7 @@ const userSchema = new mongoose.Schema(
         password: {type: String, required: [true, "Must have a password"]}
     });
 
-userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ['password']});
+// userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ['password']});
 
 // creating the table, table name is User and using userSchema
 const User = new mongoose.model("User", userSchema);
@@ -44,8 +46,13 @@ app.route("/login")
         {
             if (user)
             {
-                if (user.password === password) res.render("secrets");
-                else res.send("Wrong Password");
+                bcrypt.compare(password, user.password, function(err, result)
+                {
+                    if (result)
+                        res.render("secrets");
+                    else
+                        res.send("Wrong Password");
+                });
             }
             else
                 res.send("You have not registered, please check username again");
@@ -64,19 +71,23 @@ app.route("/register")
     })
     .post((req, res) =>
     {
-        const newUser = new User(
+        bcrypt.hash(req.body.password, saltRounds, function(err, hash)
+        {
+            const newUser = new User(
+                {
+                    email: req.body.username,
+                    password: hash
+                });
+            // when calling save after create a new user, it automatically encrypts password
+            // when we do find(); it automatically decrypts password
+            newUser.save().then(() =>
             {
-                email: req.body.username,
-                password: req.body.password
+                res.render("home");
+            }).catch(err =>
+            {
+                res.send(err + " 400 Bad request");
             });
-        // when calling save after create a new user, it automatically encrypts password
-        // when we do find(); it automatically decrypts password
-        newUser.save().then(() =>
-        {
-            res.render("home");
-        }).catch(err =>
-        {
-            res.send(err + " 400 Bad request");
+
         });
     });
 
