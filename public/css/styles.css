@@ -1,0 +1,32 @@
+
+body {
+  background-color: #E8ECEF;
+}
+
+.centered {
+    padding-top: 200px;
+    text-align: center;
+}
+
+.secret-text {
+  text-align: center;
+  font-size: 2rem;
+  color: #fff;
+  background-color: #000;
+}
+.register-btn
+{
+    margin-top: 10px;
+}
+.form-group
+{
+    margin-bottom: 10px;
+}
+.email-label
+{
+    margin-bottom: 5px;
+}
+.password-label
+{
+    margin-bottom: 5px;
+}
