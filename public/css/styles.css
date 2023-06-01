@@ -7,6 +7,10 @@ body {
     padding-top: 200px;
     text-align: center;
 }
+.btn-block
+{
+    width: 100%;
+}
 
 .secret-text {
   text-align: center;
